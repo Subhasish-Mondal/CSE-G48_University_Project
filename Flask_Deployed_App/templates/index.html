@@ -1,0 +1,207 @@
+{% extends 'base.html' %}
+
+{% block pagetitle %}
+AI Engine
+{% endblock pagetitle %}
+
+{% block body %}
+<style>
+    .card {
+    background: #f4fff7; /* soft greenish background */
+    border-radius: 20px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.card:hover {
+    transform: scale(1.02);
+    box-shadow: 0 8px 20px rgba(0, 128, 0, 0.15);
+}
+
+.card-body {
+    padding: 2rem;
+}
+
+.card-body img.rounded-circle {
+    border: 4px solid #a1e6a1;
+    padding: 5px;
+    background-color: white;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+label.btn-success {
+    background-color: #28a745;
+    border: none;
+    transition: background-color 0.3s ease;
+}
+
+label.btn-success:hover {
+    background-color: #218838;
+}
+
+button.btn-outline-dark,
+button.btn-warning,
+button.btn-outline-success {
+    transition: all 0.3s ease;
+    border-radius: 8px;
+}
+
+button.btn-outline-dark:hover {
+    background-color: #333;
+    color: white;
+}
+
+button.btn-warning:hover {
+    background-color: #e0a800;
+}
+
+button.btn-outline-success:hover {
+    background-color: #218838;
+    color: white;
+}
+
+#camera-feed {
+    border-radius: 12px;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+}
+
+#preview {
+    margin-top: 15px;
+    border: 2px solid #a1e6a1;
+}
+
+</style>
+<div class="container py-5">
+    <div class="text-center mb-5">
+        <h1 style="font-weight: 600; color: #14532d; margin-top: 25px;">🍀 MEDICAL PLANT DETECTION 🍀</h1>
+        <p class="lead text-muted">Let AI help detect the plants effortlessly</p>
+    </div>
+
+    <div class="row g-4">
+        <!-- Left Info Card -->
+        <div class="col-md-4">
+            <div class="card shadow border-0 h-100">
+                <div class="card-body">
+                    <h5 class="card-title"><strong>Why detect plant diseases?</strong></h5>
+                    <p class="card-text">
+                        Plant diseases hinder healthy growth. Early diagnosis can save resources, improve crop yield,
+                        and prevent widespread infection. Accurate detection ensures effective treatments and supports
+                        sustainable agriculture.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Center Upload Card -->
+        <div class="col-md-4">
+            <div class="card shadow border-0 text-center h-100">
+                <div class="card-body">
+                    <img src="https://eljasib.com/wp-content/uploads/2019/02/BA-1.jpg" 
+                         alt="Plant Image" class="img-fluid mb-3" width="150">
+
+                    <form action="/submit" method="POST" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <input type="file" name="image" id="actual-btn" hidden />
+                            <label class="btn btn-success mb-2" for="actual-btn">Choose File</label>
+                            <button type="button" class="btn btn-outline-dark" id="camera-btn">📷 Open Camera</button>
+                            <br />
+                            <small id="file-chosen" class="text-muted">No file chosen</small>
+                        </div>
+
+                        <div id="camera-container" class="mb-3" style="display: none;">
+                            <video id="camera-feed" width="100%" height="240" autoplay class="mb-2"></video>
+                            <button type="button" class="btn btn-warning" id="capture-btn">Capture</button>
+                        </div>
+
+                        <img id="preview" src="#" alt="Preview" style="display: none; max-width: 100%; border-radius: 8px;" />
+
+                        <p class="text-muted mt-3">Upload a leaf image to let AI detect diseases.</p>
+                        <button type="submit" class="btn btn-outline-success mt-2">🔍 Submit</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Info Card -->
+        <div class="col-md-4">
+            <div class="card shadow border-0 h-100">
+                <div class="card-body">
+                    <h5><strong>Prevent Plant Disease:</strong></h5>
+                    <ul class="list-unstyled">
+                        <li>• Use good sanitation practices</li>
+                        <li>• Fertilize regularly</li>
+                        <li>• Inspect before planting</li>
+                        <li>• Let soil warm before planting</li>
+                        <li>• Rotate crops annually</li>
+                        <li>• Ensure air circulation</li>
+                        <li>• Remove diseased parts</li>
+                    </ul>
+                    <a href="https://www.thespruce.com/prevent-plant-diseases-in-your-garden-2539511" 
+                       target="_blank" class="btn btn-outline-success btn-sm">🌿 Learn More</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript -->
+<script>
+    const actualBtn = document.getElementById('actual-btn');
+    const fileChosen = document.getElementById('file-chosen');
+    const preview = document.getElementById('preview');
+    let capturedFile = null;
+
+    actualBtn.addEventListener('change', function () {
+        fileChosen.textContent = this.files[0].name;
+        preview.src = URL.createObjectURL(this.files[0]);
+        preview.style.display = 'block';
+    });
+
+    document.getElementById('camera-btn').addEventListener('click', () => {
+        document.getElementById('camera-container').style.display = 'block';
+        startCamera();
+    });
+
+    document.getElementById('capture-btn').addEventListener('click', function () {
+        const video = document.getElementById('camera-feed');
+        const canvas = document.createElement('canvas');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        canvas.getContext('2d').drawImage(video, 0, 0);
+
+        const dataUrl = canvas.toDataURL('image/jpeg');
+        const blob = dataURItoBlob(dataUrl);
+        capturedFile = new File([blob], "camera_image.jpg", { type: 'image/jpeg' });
+
+        const dataTransfer = new DataTransfer();
+        dataTransfer.items.add(capturedFile);
+        actualBtn.files = dataTransfer.files;
+
+        fileChosen.textContent = capturedFile.name;
+        preview.src = dataUrl;
+        preview.style.display = 'block';
+    });
+
+    function startCamera() {
+        const video = document.getElementById('camera-feed');
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(stream => {
+                video.srcObject = stream;
+            })
+            .catch(err => {
+                console.error("Camera access denied:", err);
+            });
+    }
+
+    function dataURItoBlob(dataURI) {
+        const byteString = atob(dataURI.split(',')[1]);
+        const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+        const ab = new ArrayBuffer(byteString.length);
+        const ia = new Uint8Array(ab);
+        for (let i = 0; i < byteString.length; i++) {
+            ia[i] = byteString.charCodeAt(i);
+        }
+        return new Blob([ab], { type: mimeString });
+    }
+</script>
+{% endblock body %}

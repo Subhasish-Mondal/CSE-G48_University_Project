@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block pagetitle %}
+Medicinal Plant Market
+{% endblock pagetitle %}
+
+{% block body %}
+<br>
+<div class="row mb-5 text-center text-white">
+    <div class="col-lg-10 mx-auto">
+        <h1 class="display-4" style="padding-top: 2%;font-weight: 400;color: rgb(4, 54, 4);">
+            <b>🌿 Medicinal Plants & Supplements 🌿</b>
+        </h1>
+        <p class="lead" style="font-weight: 500;color: black;">Explore natural remedies and supplements</p>
+    </div>
+</div>
+
+<div class="row p-3">
+    {% for index in range(0, supplement_name | length) %}
+    <div class="col-md-3 mb-4">
+        <div class="p-4 bg-white shadow rounded-lg h-100">
+            <center>
+                <h5 class="mb-2"><b style="color: green;">Medicinal Plant</b></h5>
+                <img src="{{ supplement_image[index] }}" width="180" height="220" alt="{{ supplement_name[index] }}"
+                    onerror="this.src='/static/images/placeholder.jpg';">
+                <br><br>
+                <h6><b>{{ supplement_name[index] }}</b></h6>
+                <p style="font-size: 14px;">Used for: <b>{{ disease[index] }}</b></p>
+                <a target="_blank" href="{{ buy[index] }}">
+                    <button type="button" class="btn btn-success" style="background-color: #05380b;">Buy Product</button>
+                </a>
+            </center>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock body %}

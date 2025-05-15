@@ -1,0 +1,1185 @@
+{% extends 'base.html' %}
+{% block pagetitle %}
+Plant Disease Detection
+{% endblock pagetitle %}
+{% block body %}
+<style>
+        :root {
+            --primary: #2c7744;
+            --secondary: #4caf50;
+            --light: #e8f5e9;
+            --dark: #1b5e20;
+            --accent: #ff9800;
+            --text: #333;
+            --white: #fff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f9f9f9;
+            color: var(--text);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header & Navigation */
+        header {
+            background-color: var(--white);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo-text {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-left: 10px;
+        }
+
+        .logo-icon {
+            color: var(--primary);
+            font-size: 28px;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+
+        .nav-links li {
+            margin-left: 30px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text);
+            font-weight: 500;
+            transition: color 0.3s;
+            padding: 8px 0;
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--primary);
+            transition: width 0.3s;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .active::after {
+            width: 100% !important;
+        }
+
+        .active {
+            color: var(--primary) !important;
+        }
+
+        .mobile-menu {
+            display: none;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        /* Hero Section */
+        #hero {
+            padding-top: 120px;
+            padding-bottom: 80px;
+            background: linear-gradient(135deg, var(--light), #f1f8e9);
+            text-align: center;
+        }
+
+        .hero-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        h1 {
+            font-size: 48px;
+            color: var(--primary);
+            margin-bottom: 20px;
+        }
+
+        .hero-text {
+            font-size: 18px;
+            color: var(--text);
+            max-width: 800px;
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 14px 28px;
+            background-color: var(--primary);
+            color: var(--white);
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            background-color: var(--dark);
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            margin-left: 15px;
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--primary);
+            color: var(--white);
+        }
+
+        /* Features Section */
+        .section {
+            padding: 80px 0;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 36px;
+            color: var(--primary);
+            margin-bottom: 60px;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+        }
+
+        .feature-card {
+            background-color: var(--white);
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s;
+            text-align: center;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .feature-icon {
+            font-size: 40px;
+            color: var(--primary);
+            margin-bottom: 20px;
+        }
+
+        .feature-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--dark);
+        }
+
+        .feature-text {
+            font-size: 16px;
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        /* How It Works Section */
+        #how-it-works {
+            background-color: var(--light);
+        }
+
+        .steps {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .steps::before {
+            content: '';
+            position: absolute;
+            top: 50px;
+            left: 20%;
+            width: 60%;
+            height: 3px;
+            background-color: var(--secondary);
+            z-index: 1;
+        }
+
+        .step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+            width: 180px;
+        }
+
+        .step-number {
+            width: 60px;
+            height: 60px;
+            background-color: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--white);
+            margin-bottom: 20px;
+        }
+
+        .step-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            text-align: center;
+            color: var(--dark);
+        }
+
+        .step-text {
+            font-size: 14px;
+            text-align: center;
+            color: var(--text);
+            line-height: 1.5;
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--dark);
+            color: var(--white);
+            padding: 50px 0 20px;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-logo-text {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .footer-text {
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .footer-social {
+            display: flex;
+            gap: 15px;
+        }
+
+        .social-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.3s;
+        }
+
+        .social-icon:hover {
+            background-color: var(--secondary);
+        }
+
+        .footer-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 10px;
+        }
+
+        .footer-links a {
+            color: var(--white);
+            text-decoration: none;
+            opacity: 0.8;
+            transition: opacity 0.3s;
+        }
+
+        .footer-links a:hover {
+            opacity: 1;
+        }
+
+        .copyright {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        /* Upload Page Specific */
+        #upload-container {
+            background-color: var(--white);
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .upload-area {
+            border: 2px dashed var(--secondary);
+            border-radius: 10px;
+            padding: 60px 20px;
+            text-align: center;
+            margin-bottom: 30px;
+            transition: background-color 0.3s;
+            cursor: pointer;
+        }
+
+        .upload-area:hover {
+            background-color: rgba(76, 175, 80, 0.05);
+        }
+
+        .upload-icon {
+            font-size: 48px;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+
+        .upload-text {
+            font-size: 18px;
+            color: var(--text);
+            margin-bottom: 10px;
+        }
+
+        .upload-hint {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .preview-container {
+            display: none;
+            margin-top: 30px;
+        }
+
+        .preview-image {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 8px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .preview-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .preview-clear {
+            color: #f44336;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .result-container {
+            display: none;
+            margin-top: 40px;
+            padding: 20px;
+            border-radius: 8px;
+            background-color: var(--light);
+        }
+
+        .result-header {
+            font-size: 24px;
+            color: var(--primary);
+            margin-bottom: 20px;
+        }
+
+        .plant-info {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .plant-image {
+            max-width: 100%;
+            border-radius: 8px;
+        }
+
+        .plant-details h3 {
+            font-size: 20px;
+            color: var(--dark);
+            margin-bottom: 10px;
+        }
+
+        .plant-scientific {
+            font-style: italic;
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        .plant-properties {
+            margin-bottom: 15px;
+        }
+
+        .plant-property {
+            display: inline-block;
+            background-color: rgba(76, 175, 80, 0.1);
+            color: var(--primary);
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 13px;
+            margin-right: 8px;
+            margin-bottom: 8px;
+        }
+
+        .plant-description {
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        /* About Page */
+        .about-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .about-subtitle {
+            font-size: 18px;
+            color: #666;
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .about-mission {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 50px;
+            align-items: center;
+            margin-bottom: 80px;
+        }
+
+        .mission-image {
+            max-width: 100%;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .mission-content h2 {
+            font-size: 32px;
+            color: var(--primary);
+            margin-bottom: 25px;
+        }
+
+        .mission-text {
+            font-size: 16px;
+            line-height: 1.8;
+            margin-bottom: 25px;
+            color: var(--text);
+        }
+
+        .team-members {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            margin-top: 60px;
+        }
+
+        .team-member {
+            background-color: var(--white);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s;
+        }
+
+        .team-member:hover {
+            transform: translateY(-10px);
+        }
+
+        .member-image {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+        }
+
+        .member-info {
+            padding: 20px;
+            text-align: center;
+        }
+
+        .member-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 5px;
+        }
+
+        .member-role {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        .member-bio {
+            font-size: 14px;
+            line-height: 1.6;
+            color: var(--text);
+        }
+
+        /* Database Page */
+        .search-container {
+            max-width: 600px;
+            margin: 0 auto 40px;
+        }
+
+        .search-box {
+            display: flex;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            border-radius: 50px;
+            overflow: hidden;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 15px 25px;
+            border: none;
+            outline: none;
+            font-size: 16px;
+        }
+
+        .search-btn {
+            background-color: var(--primary);
+            color: var(--white);
+            border: none;
+            padding: 0 30px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .search-btn:hover {
+            background-color: var(--dark);
+        }
+
+        .filter-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            background-color: var(--white);
+            color: var(--text);
+            border: 1px solid #ddd;
+            padding: 8px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+
+        .filter-btn:hover, .filter-btn.active {
+            background-color: var(--primary);
+            color: var(--white);
+            border-color: var(--primary);
+        }
+
+        .plants-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 30px;
+        }
+
+        .plant-card {
+            background-color: var(--white);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s;
+        }
+
+        .plant-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .plant-card-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .plant-card-content {
+            padding: 20px;
+        }
+
+        .plant-card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 5px;
+        }
+
+        .plant-card-scientific {
+            font-style: italic;
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        .plant-card-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .plant-card-tag {
+            background-color: rgba(76, 175, 80, 0.1);
+            color: var(--primary);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+        }
+
+        .plant-card-link {
+            display: inline-block;
+            color: var(--primary);
+            font-weight: 500;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s;
+        }
+
+        .plant-card-link:hover {
+            color: var(--dark);
+        }
+
+        /* Contact Page */
+        .contact-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 50px;
+            align-items: start;
+        }
+
+        .contact-info {
+            background-color: var(--white);
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .contact-info-title {
+            font-size: 24px;
+            color: var(--primary);
+            margin-bottom: 30px;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 25px;
+        }
+
+        .contact-icon {
+            width: 40px;
+            height: 40px;
+            background-color: rgba(76, 175, 80, 0.1);
+            color: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        .contact-details h4 {
+            font-size: 18px;
+            color: var(--dark);
+            margin-bottom: 5px;
+        }
+
+        .contact-details p {
+            font-size: 16px;
+            color: #666;
+            line-height: 1.5;
+        }
+
+        .contact-form {
+            background-color: var(--white);
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .form-title {
+            font-size: 24px;
+            color: var(--primary);
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 16px;
+            color: var(--dark);
+            margin-bottom: 8px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        textarea.form-control {
+            min-height: 150px;
+            resize: vertical;
+        }
+
+        /* Plant Details Page */
+        .plant-detail-container {
+            background-color: var(--white);
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            margin: 0 auto;
+        }
+
+        .plant-header {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 40px;
+            margin-bottom: 50px;
+        }
+
+        .plant-detail-image {
+            width: 100%;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .plant-detail-info h1 {
+            font-size: 36px;
+            color: var(--dark);
+            margin-bottom: 10px;
+        }
+
+        .plant-detail-scientific {
+            font-style: italic;
+            font-size: 18px;
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .plant-detail-properties {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        .plant-detail-property {
+            background-color: rgba(76, 175, 80, 0.1);
+            color: var(--primary);
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+
+        .plant-description-section {
+            margin-bottom: 40px;
+        }
+
+        .plant-section-title {
+            font-size: 24px;
+            color: var(--primary);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--light);
+        }
+
+        .plant-description-text {
+            font-size: 16px;
+            line-height: 1.8;
+            color: var(--text);
+        }
+
+        .plant-benefits-list {
+            list-style: none;
+        }
+
+        .plant-benefits-list li {
+            position: relative;
+            padding-left: 30px;
+            margin-bottom: 15px;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        .plant-benefits-list li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--secondary);
+            font-weight: bold;
+        }
+
+        .plant-usage-section {
+            margin-bottom: 40px;
+        }
+
+        .plant-more-section {
+            background-color: var(--light);
+            padding: 30px;
+            border-radius: 10px;
+        }
+
+        .similar-plants {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .similar-plant {
+            background-color: var(--white);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s;
+        }
+
+        .similar-plant:hover {
+            transform: translateY(-5px);
+        }
+
+        .similar-plant-image {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+        }
+
+        .similar-plant-content {
+            padding: 15px;
+        }
+
+        .similar-plant-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 5px;
+        }
+
+        .similar-plant-scientific {
+            font-style: italic;
+            font-size: 12px;
+            color: #666;
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .features {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .steps::before {
+                display: none;
+            }
+            
+            .steps {
+                flex-direction: column;
+                align-items: center;
+                gap: 40px;
+            }
+            
+            .footer-content {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .contact-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .plant-header {
+                grid-template-columns: 1fr;
+            }
+            
+            .about-mission {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            
+            .mobile-menu {
+                display: block;
+            }
+            
+            .features {
+                grid-template-columns: 1fr;
+            }
+            
+            .team-members {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .footer-content {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            h1 {
+                font-size: 36px;
+            }
+            
+            .section-title {
+                font-size: 28px;
+            }
+            
+            .hero-text {
+                font-size: 16px;
+            }
+            
+            .btn {
+                padding: 12px 24px;
+                font-size: 14px;
+            }
+            
+            .team-members {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</style>
+<body>
+  <!-- Header -->
+  <header>
+      <div class="container">
+          <div class="header-content">
+              <div class="logo">
+                  <span class="logo-icon">🌿</span>
+                  <span class="logo-text">MediPlant</span>
+              </div>
+              <ul class="nav-links">
+                  <li><a href="index.html" class="active">Home</a></li>
+                  <li><a href="upload.html">Detect Plant</a></li>
+                  <li><a href="database.html">Plant Database</a></li>
+                  <li><a href="about.html">About Us</a></li>
+                  <li><a href="contact.html">Contact</a></li>
+              </ul>
+              <div class="mobile-menu">☰</div>
+          </div>
+      </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section id="hero">
+      <div class="container">
+          <div class="hero-content">
+              <h1>Discover Medicinal Plants</h1>
+              <p class="hero-text">Upload a photo and instantly identify medicinal plants, learn about their healing properties, and discover traditional uses for better health and wellness.</p>
+              <div>
+                  <a href="/index" class="btn">Identify Plant</a>
+                  <a href="database.html" class="btn btn-secondary">Browse Database</a>
+              </div>
+          </div>
+      </div>
+  </section>
+
+  <!-- Features Section -->
+  <section id="features" class="section">
+      <div class="container">
+          <h2 class="section-title">Our Features</h2>
+          <div class="features">
+              <div class="feature-card">
+                  <div class="feature-icon">🔍</div>
+                  <h3 class="feature-title">Instant Identification</h3>
+                  <p class="feature-text">Quickly identify medicinal plants by simply uploading a photo, with high accuracy and detailed information.</p>
+              </div>
+              <div class="feature-card">
+                  <div class="feature-icon">📚</div>
+                  <h3 class="feature-title">Rich Database</h3>
+                  <p class="feature-text">Access comprehensive information about thousands of medicinal plants, their properties, and traditional uses.</p>
+              </div>
+              <div class="feature-card">
+                  <div class="feature-icon">💊</div>
+                  <h3 class="feature-title">Health Benefits</h3>
+                  <p class="feature-text">Learn about the health benefits, medicinal properties, and proper usage of each identified plant.</p>
+              </div>
+          </div>
+      </div>
+  </section>
+
+  <!-- How It Works Section -->
+  <section id="how-it-works" class="section">
+      <div class="container">
+          <h2 class="section-title">How It Works</h2>
+          <div class="steps">
+              <div class="step">
+                  <div class="step-number">1</div>
+                  <h3 class="step-title">Take a Photo</h3>
+                  <p class="step-text">Take a clear photo of the plant you want to identify using your smartphone.</p>
+              </div>
+              <div class="step">
+                  <div class="step-number">2</div>
+                  <h3 class="step-title">Upload Image</h3>
+                  <p class="step-text">Upload the photo to our platform through the website or mobile app.</p>
+              </div>
+              <div class="step">
+                  <div class="step-number">3</div>
+                  <h3 class="step-title">Instant Results</h3>
+                  <p class="step-text">Get instant identification with detailed information about the medicinal plant.</p>
+              </div>
+          </div>
+      </div>
+  </section>
+
+  <!-- Popular Plants Section -->
+  <section id="popular-plants" class="section">
+      <div class="container">
+          <h2 class="section-title">Popular Medicinal Plants</h2>
+          <div class="plants-grid">
+              <div class="plant-card">
+                  <img src="https://2.bp.blogspot.com/-Fk_E6wVntKY/VztQZFbsiMI/AAAAAAAAKfY/PW4Cr8HPXw4iitZ0CSV3vcZQ-Ir_2hslACLcB/s1600/Tulsi_or_Tulasi_Holy_basil.jpg" alt="Tulsi (Holy Basil)" class="plant-card-image">
+                  <div class="plant-card-content">
+                      <h3 class="plant-card-title">Tulsi (Holy Basil)</h3>
+                      <p class="plant-card-scientific">Ocimum sanctum</p>
+                      <div class="plant-card-tags">
+                          <span class="plant-card-tag">Antioxidant</span>
+                          <span class="plant-card-tag">Adaptogenic</span>
+                      </div>
+                      <a href="plant-details.html" class="plant-card-link">View Details →</a>
+                  </div>
+              </div>
+              <div class="plant-card">
+                  <img src="https://plantura.garden/uk/wp-content/uploads/sites/2/2023/06/ashwagandha-fruits.jpg" alt="Ashwagandha" class="plant-card-image">
+                  <div class="plant-card-content">
+                      <h3 class="plant-card-title">Ashwagandha</h3>
+                      <p class="plant-card-scientific">Withania somnifera</p>
+                      <div class="plant-card-tags">
+                          <span class="plant-card-tag">Anti-stress</span>
+                          <span class="plant-card-tag">Immunity</span>
+                      </div>
+                      <a href="plant-details.html" class="plant-card-link">View Details →</a>
+                  </div>
+              </div>
+              <div class="plant-card">
+                  <img src="https://img.staticmb.com/mbcontent/images/uploads/2022/5/Aloe%20vera%20plant%20kept%20in%20full%20sunlight.jpg" alt="Aloe Vera" class="plant-card-image">
+                  <div class="plant-card-content">
+                      <h3 class="plant-card-title">Aloe Vera</h3>
+                      <p class="plant-card-scientific">Aloe barbadensis miller</p>
+                      <div class="plant-card-tags">
+                          <span class="plant-card-tag">Skin Care</span>
+                          <span class="plant-card-tag">Digestive</span>
+                      </div>
+                      <a href="plant-details.html" class="plant-card-link">View Details →</a>
+                  </div>
+              </div>
+              <div class="plant-card">
+                  <img src="https://img.freepik.com/premium-photo/turmeric-powder-herbal_67467-5.jpg" alt="Turmeric" class="plant-card-image">
+                  <div class="plant-card-content">
+                      <h3 class="plant-card-title">Turmeric</h3>
+                      <p class="plant-card-scientific">Curcuma longa</p>
+                      <div class="plant-card-tags">
+                          <span class="plant-card-tag">Anti-inflammatory</span>
+                          <span class="plant-card-tag">Antioxidant</span>
+                      </div>
+                      <a href="plant-details.html" class="plant-card-link">View Details →</a>
+                  </div>
+              </div>
+          </div>
+          <div style="text-align: center; margin-top: 40px;">
+              <a href="database.html" class="btn">View All Plants</a>
+          </div>
+      </div>
+  </section>
+{% endblock body %}
